@@ -13,6 +13,8 @@ class AudioService {
     if (_isInitialized) return;
 
     try {
+      // Configurar volumen máximo
+      await _audioPlayer.setVolume(1.0);
       _isInitialized = true;
       log('✅ AudioService inicializado correctamente');
     } catch (e) {
@@ -26,9 +28,12 @@ class AudioService {
     }
 
     try {
+      // Asegurar volumen máximo antes de reproducir
+      await _audioPlayer.setVolume(1.0);
+      
       // Reproducir el archivo MP3 de alerta
       await _audioPlayer.play(AssetSource('audio/alerta.mp3'));
-      log('🔔 Sonido de alerta reproducido');
+      log('🔔 Sonido de alerta reproducido a volumen máximo');
     } catch (e) {
       log('💥 Error reproduciendo sonido: $e');
     }

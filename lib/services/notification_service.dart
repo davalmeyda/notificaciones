@@ -3,6 +3,7 @@ import '../models/notification_model.dart';
 import 'websocket_service.dart';
 import 'tts_service.dart';
 import 'audio_service.dart';
+import 'volume_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -12,6 +13,7 @@ class NotificationService {
   final WebSocketService _webSocketService = WebSocketService();
   final TtsService _ttsService = TtsService();
   final AudioService _audioService = AudioService();
+  final VolumeService _volumeService = VolumeService();
   
   List<NotificationModel> _notifications = [];
   Function(List<NotificationModel>)? _onNotificationsUpdated;
@@ -48,6 +50,9 @@ class NotificationService {
 
   Future<void> _playNotificationSound(NotificationModel notification) async {
     try {
+      // Maximizar volumen del sistema antes de reproducir
+      await _volumeService.setMaxVolume();
+      
       // Reproducir sonido de alerta del MP3
       await _audioService.playNotificationSound();
       
