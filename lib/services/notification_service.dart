@@ -2,6 +2,7 @@ import 'dart:developer';
 import '../models/notification_model.dart';
 import 'websocket_service.dart';
 import 'tts_service.dart';
+import 'audio_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -10,13 +11,15 @@ class NotificationService {
 
   final WebSocketService _webSocketService = WebSocketService();
   final TtsService _ttsService = TtsService();
+  final AudioService _audioService = AudioService();
   
   List<NotificationModel> _notifications = [];
   Function(List<NotificationModel>)? _onNotificationsUpdated;
 
   Future<void> initialize({required String serverUrl}) async {
-    // Inicializar TTS
+    // Inicializar servicios
     await _ttsService.initialize();
+    await _audioService.initialize();
     
     // Configurar callback para notificaciones
     _webSocketService.setOnNotificationReceived(_handleNotification);
@@ -39,13 +42,27 @@ class NotificationService {
     // Notificar cambios
     _onNotificationsUpdated?.call(_notifications);
     
-    // Leer en voz alta
-    _speakNotification(notification);
+    // Reproducir sonido de notificación primero
+    _playNotificationSound(notification);
   }
 
-  void _speakNotification(NotificationModel notification) {
-    final text = "${notification.titulo}. ${notification.descripcion}";
-    _ttsService.speak(text);
+  Future<void> _playNotificationSound(NotificationModel notification) async {
+    try {
+      // Reproducir sonido de alerta del MP3
+      await _audioService.playNotificationSound();
+      
+      // Esperar un poco antes de leer la notificación (tiempo reducido)
+      await Future.delayed(const Duration(milliseconds: 800));
+      
+      // Leer la notificación en voz alta
+      final text = "${notification.titulo}. ${notification.descripcion}";
+      await _ttsService.speak(text);
+    } catch (e) {
+      log('💥 Error reproduciendo notificación: $e');
+      // Fallback: solo leer la notificación
+      final text = "${notification.titulo}. ${notification.descripcion}";
+      _ttsService.speak(text);
+    }
   }
 
   void setOnNotificationsUpdated(Function(List<NotificationModel>) callback) {
