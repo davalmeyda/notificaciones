@@ -16,10 +16,10 @@ class TtsService {
       // Configurar idioma
       await _flutterTts.setLanguage("es-ES");
       
-      // Configurar velocidad y tono (velocidad más lenta)
+      // Configurar velocidad y tono (velocidad más lenta, volumen máximo)
       await _flutterTts.setSpeechRate(0.7);
       await _flutterTts.setPitch(1.0);
-      await _flutterTts.setVolume(1.0);
+      await _flutterTts.setVolume(1.0); // Ya está al máximo (1.0)
 
       _isInitialized = true;
       log('✅ TTS inicializado correctamente');
