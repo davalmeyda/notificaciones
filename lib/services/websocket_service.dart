@@ -1,5 +1,5 @@
 import 'dart:developer';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import '../models/notification_model.dart';
 
 class WebSocketService {
@@ -7,12 +7,12 @@ class WebSocketService {
   factory WebSocketService() => _instance;
   WebSocketService._internal();
 
-  IO.Socket? _socket;
+  io.Socket? _socket;
   Function(NotificationModel)? _onNotificationReceived;
 
   void connect({required String serverUrl}) {
     try {
-      _socket = IO.io(serverUrl, <String, dynamic>{
+      _socket = io.io(serverUrl, <String, dynamic>{
         'transports': ['websocket'],
         'autoConnect': false,
       });

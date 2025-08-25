@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
+import 'kiosk_screen.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -15,7 +16,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final NotificationService _notificationService = NotificationService();
   List<NotificationModel> _notifications = [];
   bool _isConnected = false;
-  String _serverUrl = 'http://localhost:3000';
+  String _serverUrl = 'http://chiquicloud.com:3333';
   
   final TextEditingController _serverController = TextEditingController();
   final TextEditingController _tituloController = TextEditingController();
@@ -77,17 +78,29 @@ class _NotificationScreenState extends State<NotificationScreen> {
       if (response.statusCode == 201) {
         _tituloController.clear();
         _descripcionController.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Notificación enviada')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Notificación enviada')),
+          );
+        }
       } else {
         throw Exception('Error: ${response.statusCode}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error enviando notificación: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error enviando notificación: $e')),
+        );
+      }
     }
+  }
+
+  void _goToKioskMode() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const KioskScreen(),
+      ),
+    );
   }
 
   @override
@@ -97,6 +110,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
         title: const Text('Notificaciones en Voz Alta'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.fullscreen),
+            onPressed: _goToKioskMode,
+            tooltip: 'Modo Quiosco',
+          ),
           IconButton(
             icon: Icon(_isConnected ? Icons.wifi : Icons.wifi_off),
             onPressed: () {},
@@ -126,7 +144,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             controller: _serverController,
                             decoration: const InputDecoration(
                               labelText: 'URL del servidor',
-                              hintText: 'http://localhost:3000',
+                              hintText: 'http://chiquicloud.com:3333',
                             ),
                           ),
                         ),

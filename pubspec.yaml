@@ -46,6 +46,9 @@ dependencies:
   
   # Audio player para sonidos
   audioplayers: ^6.1.0
+  
+  # Mantener pantalla encendida
+  wakelock_plus: ^1.2.8
 
 dev_dependencies:
   flutter_test:
